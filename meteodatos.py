@@ -28,7 +28,9 @@ def datos_registrados(datos):
     #   datos[], es una lista con una fila de encabezado
     # retorna:
     #   una lista con los nombres encontrados en la fila de cabecera
-    datos_encontrados = datos[0].split(';')[0]
+    datos_encontrados = []
+    for dato in datos[0].split(';'):
+        datos_encontrados.append(dato)
     return datos_encontrados
 
 
@@ -60,17 +62,15 @@ def filtrar_dia(datos, dia):
     # retorna: la misma lista 'datos', pero conteniendo únicamente las filas
     #          que coinciden con 'dia' y manteniendo la cabecera
     
-    # TODO: Escriba su código aquí
-    # ---------------------------------------------
-    datos_f = []
-    datos_f.append(datos[0])
-    for fila in datos[1:]:
-        if dia in fila:
-            datos_f.append(fila)
-    return datos_f
-    # ---------------------------------------------
-    
-    return []  # reemplace la lista vacía [] por el resultado de su código
+    filtrados = []
+    for fila in datos:
+        # separamos los datos en cada fila para verificar la fecha ingresada en 'dia' está en 'momento'
+        # (la fecha podría aparecer en otro campo, pero solo nos interesa 'momento')
+        if dia in fila.split(';')[3]:
+            filtrados.append(fila)
+    # se agrega la fila de cabecera
+    filtrados.insert(0, datos[0])
+    return filtrados
 
 
 def estadisticas_dia(datos, dia):
@@ -78,20 +78,17 @@ def estadisticas_dia(datos, dia):
     #        mediante la función 'leer_archivo()'
     # dia:   el día que se desea reportar, en formato 'AAAA-MM-DD', ejemplo: '2023-03-01'
     # retorna: tmax, tmin, tmedia, la temperatura máxima, mínima y promedio para el día.
+    
     tmax = tmin = tmedia = 0
-    
-    # TODO: Escriba su código aquí
-    # ---------------------------------------------
-    cabecera_ts = []
-    cabecera_ts = filtrar_dia(datos,dia)
-    datos_f1 = filtrar_cabecera(cabecera_ts, 'ts')
-    datos_f1.remove('ts')
-    tmax = max(datos_f1)
-    tmin = min(datos_f1)
-    tmedia = round(sum(datos_f1)/len(datos_f1),1)
-    
-    # ---------------------------------------------
-    # Su código termina aquí, luego se retornan los datos calculados
+    # primero eliminamos todas las filas que no correspondan a 'dia'
+    filtro_dia = filtrar_dia(datos, dia)
+    # luego filtramos para dejar solo la columna 'ts'
+    filtro_t = filtrar_cabecera(filtro_dia, 'ts')
+    # finalmente eliminamos la cabecera y calculamos las estadisticas
+    t = filtro_t[1:]
+    tmax = max(t)
+    tmin = min(t)
+    tmedia = round(sum(t)/len(t), 1)
     
     return tmax, tmin, tmedia
     
